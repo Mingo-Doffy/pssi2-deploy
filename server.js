@@ -9,11 +9,11 @@ const app = express();
 
 // Configuration CORS
 // Configuration CORS étendue
-const allowedOrigin = 'https://frontend-production-6406.up.railway.app/';
+const allowedOrigins = 'https://frontend-production-6406.up.railway.app/';
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || origin === allowedOrigin) {
+    if (!origin || origin === allowedOrigins) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -74,5 +74,5 @@ app.listen(PORT, () => {
   const timestamp = new Date().toISOString();
   console.log(`[${timestamp}] Serveur démarré sur le port ${PORT}`);
   console.log(`Environnement: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`Origines CORS autorisées: ${allowedOrigin}`); // Log l'origine manuelle
+  console.log(`Origines CORS autorisées: ${allowedOrigins}`); // Log l'origine manuelle
 });
