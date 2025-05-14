@@ -25,9 +25,9 @@ const corsOptions = {
 };
 */
 // Middlewares de sécurité
+app.use(cors());
 app.use(helmet());
 app.use(express.json());
-app.use(cors());
 //app.use(cors(corsOptions));
 
 // Rate limiting
