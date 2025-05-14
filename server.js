@@ -24,71 +24,35 @@ const corsOptions = {
   credentials: true
 };
 
-// Middlewares
+// Middlewares de sécurité
 app.use(helmet());
 app.use(express.json());
-app.use(cors(corsOptions)); // Doit être avant les routes
-
-// Routes API
-app.use('/api', apiRouter);
-// Gestion des erreurs
-app.use((err, req, res, next) => {
-  const timestamp = new Date().toISOString();
-  console.error(`[${timestamp}] Erreur:`, err.stack);
-
-  // Toujours retourner du JSON
-  res.setHeader('Content-Type', 'application/json');
-  res.status(err.status || 500).send(JSON.stringify({
-    error: err.code || 'SERVER_ERROR',
-    message: process.env.NODE_ENV === 'development' 
-      ? err.message 
-      : 'Une erreur est survenue',
-    timestamp
-  }));
-});
-
-// Middleware pour les routes non trouvées
-app.use((req, res) => {
-  res.setHeader('Content-Type', 'application/json');
-  res.status(404).send(JSON.stringify({
-    error: 'NOT_FOUND',
-    message: 'Route non trouvée'
-  }));
-});
+app.use(cors(corsOptions));
 
 // Rate limiting
-const rateLimitWindow = parseInt(process.env.RATE_LIMIT_WINDOW) || 60;
-const rateLimitMax = parseInt(process.env.RATE_LIMIT_MAX) || 100;
+const rateLimitWindow = parseInt(process.env.RATE_LIMIT_WINDOW);
+const rateLimitMax = parseInt(process.env.RATE_LIMIT_MAX);
 
 const limiter = rateLimit({
-  windowMs: rateLimitWindow * 60 * 1000,
-  max: rateLimitMax,
+  windowMs: (isNaN(rateLimitWindow) ? 60 : rateLimitWindow) * 60 * 1000, // Default à 1 heure si non défini
+  max: isNaN(rateLimitMax) ? 100 : rateLimitMax, // Default à 100 requêtes si non défini
   message: {
     error: 'TOO_MANY_REQUESTS',
     message: 'Trop de requêtes depuis cette IP'
   }
 });
-app.use('/auth', limiter);
-app.options('*', cors(corsOptions));
+app.use('/auth', limiter); // Applique le rate limiting uniquement aux routes d'authentification
 
-// Health Check avec vérification MySQL
-app.get('/health', async (req, res) => {
-  try {
-    const [rows] = await pool.query('SELECT 1');
-    res.status(200).json({
-      status: 'OK',
-      database: 'connected',
-      environment: process.env.NODE_ENV || 'development',
-      timestamp: new Date().toISOString()
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: 'ERROR',
-      database: 'disconnected',
-      error: err.message,
-      timestamp: new Date().toISOString()
-    });
-  }
+// Routes
+app.use('/api', apiRouter);
+
+// Health Check
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    environment: process.env.NODE_ENV || 'development', // Fallback pour local
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Gestion des erreurs
@@ -96,32 +60,19 @@ app.use((err, req, res, next) => {
   const timestamp = new Date().toISOString();
   console.error(`[${timestamp}] Erreur:`, err.stack);
 
-  res.status(err.status || 500).json({
-    error: err.code || 'SERVER_ERROR',
-    message: process.env.NODE_ENV === 'development' 
-      ? err.message 
+  res.status(500).json({
+    error: 'SERVER_ERROR',
+    message: process.env.NODE_ENV === 'development'
+      ? err.message
       : 'Une erreur est survenue',
-    timestamp
+    timestamp: timestamp // Ajout du timestamp pour le débogage
   });
 });
 
-// Démarrage du serveur
-const startServer = async () => {
-  try {
-    const PORT = parseInt(process.env.PORT) || 5000;
-    app.listen(PORT, () => {
-      const timestamp = new Date().toISOString();
-      console.log(`[${timestamp}] Serveur démarré sur le port ${PORT}`);
-      console.log(`Environnement: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`Origines CORS autorisées: ${allowedOrigins.join(', ')}`);
-    });
-  } catch (err) {
-    console.error('Échec du démarrage du serveur:', err);
-    process.exit(1);
-  }
-};
-
-startServer();
-
-
-
+const PORT = parseInt(process.env.PORT) || 5000; // Utilisation de parseInt et fallback
+app.listen(PORT, () => {
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] Serveur démarré sur le port ${PORT}`);
+  console.log(`Environnement: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Origines CORS autorisées: ${allowedOrigin}`); // Log l'origine manuelle
+});
