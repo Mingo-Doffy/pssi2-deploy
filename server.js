@@ -13,7 +13,7 @@ const allowedOrigins = [
   'http://localhost:3000',    // Frontend React en développement
   'http://localhost:80',      // Frontend sur port standard
   'http://localhost',         // Frontend sans port spécifié
-  'https://votre-domaine.com' // Production
+  'https://frontend-production-6406.up.railway.app/' // Production
 ];
 
 // Configuration CORS étendue
@@ -123,9 +123,6 @@ app.use((err, req, res, next) => {
 // Démarrage du serveur
 const startServer = async () => {
   try {
-    // Initialiser la connexion MySQL avant de démarrer le serveur
-    global.pool = await initMySQL();
-    
     const PORT = parseInt(process.env.PORT) || 5000;
     app.listen(PORT, () => {
       const timestamp = new Date().toISOString();
