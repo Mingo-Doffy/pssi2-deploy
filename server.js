@@ -84,38 +84,6 @@ const limiter = rateLimit({
   }
 });
 app.use('/auth', limiter);
-
-// Configuration et connexion à MySQL avec délai artificiel
-const initMySQL = async () => {
-  const pool = mysql.createPool({
-    host: process.env.DB_HOST || 'mysql',
-    user: process.env.DB_USER || 'user',
-    password: process.env.DB_PASSWORD || 'password',
-    database: process.env.DB_NAME || 'mydb',
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-  });
-
-  let retries = 5;
-  while (retries > 0) {
-    try {
-      const timestamp = new Date().toISOString();
-      console.log(`[${timestamp}] Tentative de connexion à MySQL... (${retries} essais restants)`);
-      await pool.query('SELECT 1');
-      console.log(`[${timestamp}] Connexion à MySQL établie avec succès!`);
-      return pool;
-    } catch (err) {
-      retries--;
-      if (retries === 0) {
-        console.error('Échec de la connexion à MySQL après plusieurs tentatives:', err);
-        throw err;
-      }
-      await new Promise(res => setTimeout(res, 5000)); // Attente de 5 secondes
-    }
-  }
-};
-
 app.options('*', cors(corsOptions));
 
 // Health Check avec vérification MySQL
