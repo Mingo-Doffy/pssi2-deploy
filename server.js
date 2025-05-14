@@ -9,7 +9,7 @@ const app = express();
 
 // Configuration CORS
 // Configuration CORS étendue
-const allowedOrigins = 'https://frontend-production-6406.up.railway.app/';
+const allowedOrigin = 'https://frontend-production-6406.up.railway.app/';
 
 const corsOptions = {
   origin: (origin, callback) => {
