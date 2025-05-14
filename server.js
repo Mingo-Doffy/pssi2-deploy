@@ -7,13 +7,13 @@ const apiRouter = require('./routes/api');
 
 const app = express();
 
-/*/ Configuration CORS
+// Configuration CORS
 // Configuration CORS étendue
-const allowedOrigins = 'https://frontend-production-6406.up.railway.app/';
+const allowedOrigin = 'https://frontend-production-6406.up.railway.app/';
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || origin === allowedOrigins) {
+    if (!origin || allowedOrigin.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -23,12 +23,12 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 };
-*/
+
+
 // Middlewares de sécurité
-app.use(cors());
 app.use(helmet());
 app.use(express.json());
-//app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 // Rate limiting
 const rateLimitWindow = parseInt(process.env.RATE_LIMIT_WINDOW);
