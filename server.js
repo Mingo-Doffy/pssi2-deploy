@@ -2,18 +2,17 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const mysql = require('mysql2/promise'); // Ajout du client MySQL
 const apiRouter = require('./routes/api');
+
 
 const app = express();
 
 // Configuration CORS
-// Configuration CORS étendue
 const allowedOrigin = 'https://frontend-production-6406.up.railway.app/';
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigin.includes(origin)) {
+    if (!origin || origin === allowedOrigin) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -23,7 +22,6 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 };
-
 
 // Middlewares de sécurité
 app.use(helmet());
@@ -75,5 +73,5 @@ app.listen(PORT, () => {
   const timestamp = new Date().toISOString();
   console.log(`[${timestamp}] Serveur démarré sur le port ${PORT}`);
   console.log(`Environnement: ${process.env.NODE_ENV || 'development'}`);
-  console.log('CORS est configuré pour autoriser toutes les origines.'); // Log l'origine manuelle
+  console.log(`Origines CORS autorisées: ${allowedOrigin}`); // Log l'origine manuelle
 });
