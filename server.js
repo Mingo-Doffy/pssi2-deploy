@@ -9,34 +9,19 @@ const app = express();
 
 // Configuration CORS
 // Configuration CORS étendue
-const allowedOrigins = [
-  'http://localhost:3000',    // Frontend React en développement
-  'http://localhost:80',      // Frontend sur port standard
-  'http://localhost',         // Frontend sans port spécifié
-  'https://frontend-production-6406.up.railway.app/' // Production
-];
+const allowedOrigins = 'https://frontend-production-6406.up.railway.app/';
 
-// Configuration CORS étendue
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Autoriser les requêtes sans origine (Postman, apps mobiles, etc.)
-    if (!origin) return callback(null, true);
-    
-    // Vérifier si l'origine est dans la liste ou si c'est une origine locale
-    if (
-      allowedOrigins.includes(origin) ||
-      origin.includes('http://localhost') || // Autoriser toutes les variantes localhost
-      origin.includes('http://127.0.0.1')    // Autoriser l'accès via IP locale
-    ) {
-      return callback(null, true);
+  origin: (origin, callback) => {
+    if (!origin || origin === allowedOrigin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
     }
-    
-    callback(new Error(`Origin ${origin} not allowed by CORS`));
   },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  credentials: true,
-  optionsSuccessStatus: 200
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 };
 
 // Middlewares
