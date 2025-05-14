@@ -7,7 +7,7 @@ const apiRouter = require('./routes/api');
 
 const app = express();
 
-// Configuration CORS
+/*/ Configuration CORS
 // Configuration CORS étendue
 const allowedOrigins = 'https://frontend-production-6406.up.railway.app/';
 
@@ -23,11 +23,12 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 };
-
+*/
 // Middlewares de sécurité
 app.use(helmet());
 app.use(express.json());
-app.use(cors(corsOptions));
+app.use(cors());
+//app.use(cors(corsOptions));
 
 // Rate limiting
 const rateLimitWindow = parseInt(process.env.RATE_LIMIT_WINDOW);
@@ -74,5 +75,5 @@ app.listen(PORT, () => {
   const timestamp = new Date().toISOString();
   console.log(`[${timestamp}] Serveur démarré sur le port ${PORT}`);
   console.log(`Environnement: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`Origines CORS autorisées: ${allowedOrigins}`); // Log l'origine manuelle
+  console.log('CORS est configuré pour autoriser toutes les origines.'); // Log l'origine manuelle
 });
