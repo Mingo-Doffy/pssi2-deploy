@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL  || 'https://backend-production-2bfb.up.railway.app/api',
+  baseURL: import.meta.env.VITE_API_URL  || 'https://backend-production-2f44.up.railway.app/api',
   headers: {
     'Content-Type': 'application/json'
   }
